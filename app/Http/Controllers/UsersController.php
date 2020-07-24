@@ -33,7 +33,8 @@ class UsersController extends Controller
         // ユーザ詳細ビューでそれらを表示
         return view('users.show', [
             'user' => $user,
-            'microposts' => $microposts,
+            'microposts' => $microposts 
+            
         ]);
     } 
 
@@ -85,4 +86,22 @@ class UsersController extends Controller
         ]);
     }
     
+ 
+    public function favorites($id)  //修正前コメント..ルーティングのパラメーターはidなので、$idであるべき Route::group(['prefix' => 'users/{id}'], function ()
+    {
+        // idの値でユーザを検索して取得  修正前コメント..引数を直せば、この記述は正しいが、代入する変数名は、$user_idではなく、$userが適切
+        $user = User::findOrFail($id);
+    
+        // 関係するモデルの件数をロード  修正前コメント..こちらも$user_idから$userへ。
+        $user->loadRelationshipCounts();
+    
+        //お気に入りの投稿一覧を作成日時の降順で取得  修正前コメント..$userは上記コードにどこにもない。上記を$user_idから$userに変更すれば正しい記述。
+        $favorites = $user->favorites()->paginate(10);
+    
+        // お気に入りの詳細ビューでそれらを表示  修正前コメント..$favoritesにはUser or Micropostインスタンスどちらのコレクションが代入されているか？ビューに渡す変数名はusersでいいのか？
+        return view('users.favorites', [
+            'user' => $user,
+            'microposts' => $favorites,
+        ]);
+    }
 }
